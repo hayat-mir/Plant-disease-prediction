@@ -9,8 +9,11 @@ import streamlit as st
 # Function to download the model from Hugging Face
 def download_model(url, model_path):
     response = requests.get(url)
-    with open(model_path, 'wb') as f:
-        f.write(response.content)
+    if response.status_code == 200:
+        with open(model_path, 'wb') as f:
+            f.write(response.content)
+    else:
+        raise Exception(f"Failed to download model. Status code: {response.status_code}")
 
 # Define paths
 working_dir = os.path.dirname(os.path.abspath(__file__))
@@ -20,7 +23,11 @@ class_indices_path = os.path.join(working_dir, 'class_indices.json')
 # Download the model if it doesn't exist locally
 if not os.path.exists(model_path):
     hugging_face_url = "https://huggingface.co/hayat52-m/plant-disease-prediction/resolve/main/plant_disease_prediction_model.h5"
-    download_model(hugging_face_url, model_path)
+    try:
+        download_model(hugging_face_url, model_path)
+    except Exception as e:
+        st.error(f"Error downloading model: {e}")
+        st.stop()
 
 # Load the pre-trained model
 model = tf.keras.models.load_model(model_path)
