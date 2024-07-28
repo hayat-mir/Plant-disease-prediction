@@ -21,6 +21,9 @@ RUN mkdir -p ~/.streamlit
 COPY app/config.toml ~/.streamlit/config.toml
 COPY app/credentials.toml ~/.streamlit/credentials.toml
 
+# Ensure permissions for the .streamlit directory
+RUN chmod -R 755 ~/.streamlit
+
 # Run the Streamlit app
 ENTRYPOINT ["streamlit", "run"]
-CMD ["main.py"]
+CMD ["app/main.py"]
